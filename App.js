@@ -1,11 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import MyButton from './components/MyButton';
+import UserDetailsScreen from './components/UserDetails';
+import { createStackNavigator } from '@react-navigation/stack';
+
 
 export default function App() {
+  const [message, setMessage] = useState("Welcome to Pip-Pop!");
+
+  const handlePress = () => {
+    setMessage("You just popped Pip-Pop! 🎉");
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.title}>Pip-Pop</Text>
+      <Text style={styles.message}>{message}</Text>
+      <MyButton title="Pop Me!" onPress={handlePress} />
     </View>
   );
 }
@@ -13,8 +24,19 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  message: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 40,
   },
 });
+
