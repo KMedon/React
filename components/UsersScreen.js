@@ -10,10 +10,10 @@ export default function UsersScreen({ navigation }) {
 
     const fetchUsers = () => {
         setLoading(true);
-        fetch('http://simfct2025.atwebpages.com/backend/listUsers.php?first=${first}&rows=${rows}&sortField=&sortOrder=ASC')
+        fetch(`http://simfct2025.atwebpages.com/backend/listUsers.php?first=${first}&rows=${rows}&sortField=&sortOrder=ASC`)
             .then(response => response.json())
             .then((json) => {
-                if (json.result === 'success') {
+                if (json.result === "SUCCESS") {
                     setUsers(json.data);
                 } else {
                     console.error('Failed to fetch users', json.message);

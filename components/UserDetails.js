@@ -7,10 +7,10 @@ export default function UserDetailsScreen({ route }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://simfct2025.atwebpages.com/backend/findUser.php?id=${userId}')
+        fetch(`http://simfct2025.atwebpages.com/backend/findUser.php?id=${userId}`)
             .then(response => response.json())
             .then((json) => {
-                if (json.result === 'success' && json.data.length > 0) {
+                if (json.result === "SUCCESS" && json.data.length > 0) {
                     setUser(json.data[0]);
                 } else {
                     console.error('Failed to fetch user details', json.message);

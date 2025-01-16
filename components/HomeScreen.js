@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
+    
     return (
         <View style={styles.container}>
             {/* Background Image */}
@@ -16,19 +17,24 @@ export default function HomeScreen() {
                 style={styles.logo}
             />
 
-            {/* Main Content */}
-            <View style={styles.mainContent}>
-                <Text style={styles.text}>Welcome to the Home Screen!!</Text>
+            {/* Title */}
+            <Text style={styles.header}>Choose Your Content</Text>
 
-                {/* Horizontal Buttons */}
-                <View style={styles.horizontalContainer}>
-                    <TouchableOpacity style={styles.buttonPlaceholder}>
-                        <Text style={styles.buttonText}>Button 1</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonPlaceholder}>
-                        <Text style={styles.buttonText}>Button 2</Text>
-                    </TouchableOpacity>
-                </View>
+            {/* Buttons */}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('MediaList', { type: 'music' })}
+                >
+                    <Text style={styles.buttonText}>🎵 Music</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('MediaList', { type: 'video' })}
+                >
+                    <Text style={styles.buttonText}>🎥 Videos</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -38,40 +44,37 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
+        backgroundColor: '#f5f5f5',
     },
     logo: {
         width: 100,
         height: 100,
-        marginTop: 40,
-        zIndex: 10,
-    },
-    mainContent: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 5,
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
         marginBottom: 20,
     },
-    horizontalContainer: {
+    header: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 30,
+    },
+    buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '80%',
     },
-    buttonPlaceholder: {
+    button: {
         backgroundColor: '#2f95dc',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 10,
         alignItems: 'center',
+        flex: 1,
+        marginHorizontal: 10,
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
+        fontSize: 18,
     },
     backgroundImage: {
         position: 'absolute',
@@ -79,7 +82,6 @@ const styles = StyleSheet.create({
         left: 0,
         width: '100%',
         height: '100%',
-        opacity: 0.5,
-        zIndex: 0,
+        opacity: 0.3,
     },
 });
