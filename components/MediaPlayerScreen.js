@@ -1,16 +1,22 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { Video } from 'expo-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
 export default function MediaListScreen({ route, navigation }) {
     const { type } = route.params;
     const [mediaItems, setMediaItems] = useState([]);
+    const [filteredItems, setFilteredItems] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const rowsPerPage = 5;
     const [playingItem, setPlayingItem] = useState(null);
     const videoRef = useRef(null);
 
     useEffect(() => {
         const fetchMedia = async () => {
+            setLoading(true);
             const endpoint = type === 'music'
                 ? 'http://simfct2025.atwebpages.com/backend/music.php'
                 : 'http://simfct2025.atwebpages.com/backend/videos.php';
@@ -20,16 +26,30 @@ export default function MediaListScreen({ route, navigation }) {
                 const json = await response.json();
                 if (json.result === 'SUCCESS') {
                     setMediaItems(json.data);
+                    setFilteredItems(json.data.slice(0, rowsPerPage));
                 }
             } catch (error) {
                 console.error('Error fetching media:', error);
             }
+            setLoading(false);
         };
 
         fetchMedia();
     }, [type]);
 
-    const handlePlay = async (item) => {
+    // Function to filter search results
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredItems(mediaItems.slice(page * rowsPerPage, (page + 1) * rowsPerPage));
+        } else {
+            const results = mediaItems.filter((item) =>
+                item.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredItems(results.slice(page * rowsPerPage, (page + 1) * rowsPerPage));
+        }
+    }, [searchQuery, page, mediaItems]);
+
+    const handlePlay = (item) => {
         console.log("Attempting to play:", item.url);
         setPlayingItem(item);
     };
@@ -45,18 +65,50 @@ export default function MediaListScreen({ route, navigation }) {
         <View style={styles.container}>
             <Text style={styles.header}>{type === 'music' ? '🎵 Music List' : '🎥 Video List'}</Text>
 
-            <FlatList
-                data={mediaItems}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.item}
-                        onPress={() => handlePlay(item)}
-                    >
-                        <Text style={styles.itemText}>{item.title}</Text>
-                    </TouchableOpacity>
-                )}
+            {/* Search Input */}
+            <TextInput
+                style={styles.searchBar}
+                placeholder="Search by title..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
             />
+
+            {loading ? (
+                <ActivityIndicator size="large" color="#2f95dc" />
+            ) : (
+                <>
+                    {/* Media List */}
+                    <FlatList
+                        data={filteredItems}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                style={styles.item}
+                                onPress={() => handlePlay(item)}
+                            >
+                                <Text style={styles.itemText}>{item.title}</Text>
+                            </TouchableOpacity>
+                        )}
+                    />
+
+                    {/* Pagination Buttons */}
+                    <View style={styles.paginationContainer}>
+                        <TouchableOpacity
+                            style={[styles.paginationButton, page === 0 && styles.disabledButton]}
+                            onPress={() => setPage(Math.max(0, page - 1))}
+                            disabled={page === 0}
+                        >
+                            <Text style={styles.buttonText}>⬅ Previous</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.paginationButton}
+                            onPress={() => setPage(page + 1)}
+                        >
+                            <Text style={styles.buttonText}>Next ➡</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            )}
 
             {/* Video Player */}
             {type === 'video' && playingItem && (
@@ -100,6 +152,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
     },
+    searchBar: {
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        marginBottom: 10,
+    },
     item: {
         padding: 15,
         backgroundColor: '#2f95dc',
@@ -110,6 +169,24 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    paginationButton: {
+        backgroundColor: '#2f95dc',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    disabledButton: {
+        backgroundColor: '#b0b0b0',
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
     videoContainer: {
         width: '100%',
